@@ -1,6 +1,32 @@
 #!/usr/bin/env bash
 # Dependencies: bash>=3.2, coreutils, file, spotify, procps-ng, wmctrl, xdotool
 
+# Utility functions for getting songs' infos
+function spotify-dbus {
+  dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Get string:'org.mpris.MediaPlayer2.Player' string:'Metadata'
+}
+
+function spotify-dbus-entry {
+  spotify-dbus | grep -E -A 2 "$1" | grep -E -v "$1"
+}
+
+function spotify-artist {
+  spotify-dbus-entry "artist" | grep -E -v "array" | cut -b 27- | cut -d '"' -f 1| grep -E -v ^$ | sed 's/&/&#38;/g'
+}
+
+function spotify-album {
+  spotify-dbus-entry "album" | cut -b 44- | cut -d '"' -f 1| grep -E -v ^$ | sed 's/&/&#38;/g'
+}
+
+function spotify-title {
+  spotify-dbus-entry "title" | cut -b 44- | cut -d '"' -f 1| grep -E -v ^$ | sed 's/&/&#38;/g'
+}
+
+function spotify-art {
+  TMP_PIC_DIR="/tmp"
+  wget -q --output-document="${TMP_PIC_DIR}"/spotify-art.png $(spotify-dbus | grep -E -A 1 "artUrl" | cut -b 44- | cut -d '"' -f 1| grep -E -v ^$) 2> /dev/null
+}
+
 # Makes the script more portable
 readonly DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -11,9 +37,9 @@ readonly ICON="${DIR}/icons/music/spotify.png"
 
 if pidof spotify &> /dev/null; then
   # Spotify song's info
-  readonly ARTIST=$(bash "${DIR}/spotify.sh" artist | sed 's/&/&#38;/g')
-  readonly TITLE=$(bash "${DIR}/spotify.sh" title | sed 's/&/&#38;/g')
-  readonly ALBUM=$(bash "${DIR}/spotify.sh" album | sed 's/&/&#38;/g')
+  readonly ARTIST=$(spotify-artist)
+  readonly TITLE=$(spotify-title)
+  readonly ALBUM=$(spotify-album)
   readonly WINDOW_ID=$(wmctrl -l | grep -E "${ARTIST}|{$TITLE}" | awk '{print $1}')
   ARTIST_TITLE=$(echo "${ARTIST} - ${TITLE}")
 
