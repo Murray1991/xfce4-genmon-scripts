@@ -12,37 +12,8 @@ readonly ICON="${DIR}/icons/network/web.png"
 # Displays summary of tcp and udp connections
 readonly TOOLTIP=$(ss -s | head -n 3 | grep -Ev "^$")
 
-# You can pass the desired network interface on the command
-# On the generic monitor properties
-# e.g. /path/to/network-panel.sh eth0
-if [ ! -z "${1}" ]; then
-  if ship --all-interfaces | grep -w "${1}" &> /dev/null; then
-    readonly INTERFACE="${1}"
-  else
-    # Fallback option - Argument is invalid
-    # Handle 'no active interfaces at all' case
-    if [[ $(ship --interfaces | awk '{print $1}') = "" ]]; then
-      # Fallback option - No argument - No active network interface
-      # Assign the second available network interface (first is loopback)
-      readonly INTERFACE=$(ship --all-interfaces | awk '{print $2}')
-    else
-      # Fallback option - No argument
-      # Default value is the first available active network interface
-      readonly INTERFACE=$(ship --interfaces | awk '{print $1}')
-    fi
-  fi
-else
-  # Handle 'no active interfaces at all' case
-  if [[ $(ship --interfaces | awk '{print $1}') = "" ]]; then
-    # Fallback option - No argument - No active network interface
-    # Assign the second available network interface (first is loopback)
-    readonly INTERFACE=$(ship --all-interfaces | awk '{print $2}')
-  else
-    # Fallback option - No argument
-    # Default value is the first available active network interface
-    readonly INTERFACE=$(ship --interfaces | awk '{print $1}')
-  fi
-fi
+# The desired network interface must be passed
+INTERFACE=$1
 
 # Handle offline user's state
 ip route | grep ^default &>/dev/null || \
