@@ -7,7 +7,7 @@ readonly DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Optional icon to display before the text
 # Insert the absolute path of the icon
 # Recommended size is 24x24 px
-readonly ICON="${DIR}/icons/network/web.png"
+readonly ICON="${DIR}/icons/network/web.svg"
 
 # Displays summary of tcp and udp connections
 readonly TOOLTIP=$(ss -s | head -n 3 | grep -Ev "^$")

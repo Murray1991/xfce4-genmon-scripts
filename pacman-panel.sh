@@ -7,7 +7,7 @@ readonly DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Optional icon to display before the text
 # Insert the absolute path of the icon
 # Recommended size is 24x24 px
-readonly ICON="${DIR}/icons/package-manager/pacman.png"
+readonly ICON="${DIR}/icons/package-manager/pac-man.svg"
 
 # Calculate updates
 readonly AUR=$((yay -Qua 2>/dev/null || auracle sync 2>/dev/null || auracle outdated 2>/dev/null || yaourt -Qua 2>/dev/null) | wc -l)
